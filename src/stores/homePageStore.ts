@@ -28,15 +28,6 @@ export const useHomePageStore = defineStore('home', () => {
 
   const getUserData = computed(() => userData.value)
 
-  // Check if the user data is already in localStorage
-  const loadUserDataFromStorage = () => {
-    const storedData = localStorage.getItem('userData')
-    if (storedData) {
-      // If data exists in localStorage, use it directly
-      userData.value = JSON.parse(storedData)
-    }
-  }
-
   // Fetch data from Firestore
   const getDataForLoggedInUser = (): void => {
     if (!loggedInUser.value) return
@@ -77,20 +68,22 @@ export const useHomePageStore = defineStore('home', () => {
       router.push('/sign-in')
     })
   }
-
+  
+  onMounted(() => {
+    const storedData = localStorage.getItem('userData')
+    if (storedData) {
+      userData.value = JSON.parse(storedData)
+    } else {
+      getDataForLoggedInUser()
+    }
+  })
+  
   watch(loggedInUser, (newVal) => {
     if (newVal) {
       getDataForLoggedInUser()
     }
   })
-
-  onMounted(() => {
-    loadUserDataFromStorage()
-    if (!userData.value) {
-      getDataForLoggedInUser()
-    }
-  })
-
+  
   return {
     userData,
     getUserData,
