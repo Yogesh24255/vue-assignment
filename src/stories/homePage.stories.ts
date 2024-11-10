@@ -1,180 +1,53 @@
-import type { Meta, StoryObj } from '@storybook/vue3'
-import Login from '@/components/LoginPage.vue'
-import { createPinia } from 'pinia'
-import { useLogInStore } from '@/stores/loginStore'
+import { expect, userEvent, within } from '@storybook/test';
+import type { Meta, StoryObj } from '@storybook/vue3';
 
-const pinia = createPinia()
+import Dashboard from '@/components/DashboardPage.vue';
 
-const meta: Meta<typeof Login> = {
-  title: 'Components/Login',
-  component: Login,
-  decorators: [
-    () => ({
-      template: '<div class="login-wrapper"><story/></div>',
-      setup() {
-        const store = useLogInStore()
-        return { store }
-      }
-    })
-  ],
+const meta = {
+  title: 'Dashboard',
+  component: Dashboard,
+  render: () => ({
+    components: { Dashboard },
+    template: '<dashboard />',
+  }),
   parameters: {
-    pinia: pinia,
-    // Add documentation
-    docs: {
-      description: {
-        component: 'Login component that handles user authentication using email and password.'
-      }
-    }
-  }
-}
+    layout: 'fullscreen',
+  },
+} satisfies Meta<typeof Dashboard>;
 
-export default meta
-type Story = StoryObj<typeof Login>
+export default meta;
+type Story = StoryObj<typeof meta>;
 
-// Default state
+// Story for the dashboard when user data is available
 export const Default: Story = {
-  render: () => ({
-    components: { Login },
-    template: '<Login />',
-    setup() {
-      const store = useLogInStore()
-      store.$reset()
-      return { store }
-    }
-  })
-}
+  play: async ({ canvasElement }: any) => {
+    const canvas = within(canvasElement);
 
-// With Error Message
-export const WithError: Story = {
-  render: () => ({
-    components: { Login },
-    template: '<Login />',
-    setup() {
-      const store = useLogInStore()
-      // Set error message
-      store.$patch({
-        errMsg: 'Invalid email or password'
-      })
-      return { store }
-    }
-  }),
-  parameters: {
-    docs: {
-      description: {
-        story: 'Shows how the login form displays error messages.'
-      }
-    }
-  }
-}
+    // Check for user details display
+    await expect(canvas.getByText('User Details')).toBeInTheDocument();
+    await expect(canvas.getByText('Name:')).toBeInTheDocument();
+    await expect(canvas.getByText('Email:')).toBeInTheDocument();
 
-// With Pre-filled Email
-export const PrefilledEmail: Story = {
-  render: () => ({
-    components: { Login },
-    template: '<Login />',
-    setup() {
-      const store = useLogInStore()
-      store.$patch({
-        email: 'test@example.com'
-      })
-      return { store }
-    }
-  }),
-  parameters: {
-    docs: {
-      description: {
-        story: 'Login form with a pre-filled email address.'
-      }
-    }
-  }
-}
+    // Check if Sign Out button is present
+    const signOutButton = canvas.getByRole('button', { name: /Sign out/i });
+    await expect(signOutButton).toBeInTheDocument();
+  },
+};
 
-// Mock Successful Login
-export const SuccessfulLogin: Story = {
-  render: () => ({
-    components: { Login },
-    template: '<Login />',
-    setup() {
-      const store = useLogInStore()
-      
-      // Mock successful login
-      store.loginUser = async () => {
-        store.errMsg = ''
-        store.email = 'test@example.com'
-        store.password = 'password123'
-        console.log('Login successful with:', {
-          email: store.email,
-          password: store.password
-        })
-      }
-      
-      return { store }
-    }
-  }),
-  parameters: {
-    docs: {
-      description: {
-        story: 'Demonstrates a successful login attempt.'
-      }
-    }
-  }
-}
 
-// Mock Failed Login
-export const FailedLogin: Story = {
-  render: () => ({
-    components: { Login },
-    template: '<Login />',
-    setup() {
-      const store = useLogInStore()
-      
-      // Mock failed login
-      store.loginUser = async () => {
-        store.errMsg = 'Invalid credentials'
-        console.log('Login failed')
-      }
-      
-      return { store }
-    }
-  }),
-  parameters: {
-    docs: {
-      description: {
-        story: 'Demonstrates a failed login attempt with error message.'
-      }
-    }
-  }
-}
+// Story for when the user signs out
+export const SignedOut: Story = {
+  play: async ({ canvasElement }: any) => {
+    const canvas = within(canvasElement);
 
-// Mock Email Validation
-export const EmailValidation: Story = {
-  render: () => ({
-    components: { Login },
-    template: '<Login />',
-    setup() {
-      const store = useLogInStore()
-      
-      store.loginUser = async () => {
-        if (!store.email.includes('@')) {
-          store.errMsg = 'Please enter a valid email address'
-          return
-        }
-        if (!store.password) {
-          store.errMsg = 'Password is required'
-          return
-        }
-        store.errMsg = ''
-        console.log('Form validation passed')
-      }
-      
-      return { store }
+    // Find and click the Sign Out button
+    const signOutButton = canvas.getByRole('button', { name: /Sign out/i });
+    await userEvent.click(signOutButton);
+
+    // Optionally, check for redirect or logged-out state (e.g., checking localStorage or redirect message)
+    const loggedOutMessage = canvas.queryByText(/You have been logged out/i);
+    if (loggedOutMessage) {
+      await expect(loggedOutMessage).toBeInTheDocument();
     }
-  }),
-  parameters: {
-    docs: {
-      description: {
-        story: 'Shows form validation for email format and required fields.'
-      }
-    }
-  }
-}
+  },
+};

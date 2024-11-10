@@ -2,12 +2,14 @@
   <div class="flex items-center justify-center min-h-screen bg-gray-100">
     <div class="bg-white p-8 rounded-lg shadow-lg max-w-md w-full">
       <h1 class="text-2xl font-semibold text-gray-800 mb-6 text-center">Login!</h1>
+      <label for="email"></label>
       <input
         type="text"
         placeholder="Email"
         v-model="email"
         class="w-full p-3 mb-4 border border-gray-300 rounded focus:outline-none focus:ring focus:ring-indigo-200"
       />
+      <label for="password"></label>
       <input
         type="password"
         placeholder="Password"
@@ -16,6 +18,7 @@
       />
       <p v-if="errMsg" class="text-center text-red-500 font-medium mb-4">{{ errMsg }}</p>
       <button
+        role="button"
         @click="apiCall"
         class="w-full bg-indigo-600 text-white font-semibold py-3 rounded-lg hover:bg-indigo-700 transition duration-300"
       >
@@ -40,6 +43,7 @@ export default {
     const email = ref<string>('')
     const password = ref<string>('')
     const errMsg = computed(() => loginStore.getErrMsg)
+
     const apiCall = () => {
       loginStore.email = email.value
       loginStore.password = password.value
