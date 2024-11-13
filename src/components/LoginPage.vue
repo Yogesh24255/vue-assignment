@@ -50,6 +50,7 @@ export default {
       loginStore.loginUser()
     }
     onMounted(() => {
+      // log out method
       signOut(auth).then(() => {
         localStorage.removeItem('userData')
       })
