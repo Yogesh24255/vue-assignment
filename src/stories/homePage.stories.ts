@@ -1,7 +1,7 @@
-import { expect, userEvent, within } from '@storybook/test';
-import type { Meta, StoryObj } from '@storybook/vue3';
+import { expect, userEvent, within } from '@storybook/test'
+import type { Meta, StoryObj } from '@storybook/vue3'
 
-import Dashboard from '@/components/DashboardPage.vue';
+import Dashboard from '@/components/DashboardPage.vue'
 
 const meta = {
   title: 'Dashboard',
@@ -13,41 +13,47 @@ const meta = {
   parameters: {
     layout: 'fullscreen',
   },
-} satisfies Meta<typeof Dashboard>;
+} satisfies Meta<typeof Dashboard>
 
-export default meta;
-type Story = StoryObj<typeof meta>;
+export default meta
+type Story = StoryObj<typeof meta>
 
 // Story for the dashboard when user data is available
 export const Default: Story = {
   play: async ({ canvasElement }: any) => {
-    const canvas = within(canvasElement);
+    const canvas = within(canvasElement)
 
     // Check for user details display
-    await expect(canvas.getByText('User Details')).toBeInTheDocument();
-    await expect(canvas.getByText('Name:')).toBeInTheDocument();
-    await expect(canvas.getByText('Email:')).toBeInTheDocument();
+    await expect(canvas.getByText('User Details')).toBeInTheDocument()
+    await expect(canvas.getByText('Name:')).toBeInTheDocument()
+    await expect(canvas.getByText('Email:')).toBeInTheDocument()
+    await expect(canvas.getByText('Contact No:')).toBeInTheDocument()
+    await expect(canvas.getByText('Qualification:')).toBeInTheDocument()
+    await expect(canvas.getByText('Gender:')).toBeInTheDocument()
+    await expect(canvas.getByText('City:')).toBeInTheDocument()
+    await expect(canvas.getByText('Occupation:')).toBeInTheDocument()
+
 
     // Check if Sign Out button is present
-    const signOutButton = canvas.getByRole('button', { name: /Sign out/i });
-    await expect(signOutButton).toBeInTheDocument();
+    const signOutButton = canvas.getByRole('button', { name: /Sign out/i })
+    await expect(signOutButton).toBeInTheDocument()
   },
-};
+}
 
 
 // Story for when the user signs out
 export const SignedOut: Story = {
   play: async ({ canvasElement }: any) => {
-    const canvas = within(canvasElement);
+    const canvas = within(canvasElement)
 
     // Find and click the Sign Out button
-    const signOutButton = canvas.getByRole('button', { name: /Sign out/i });
-    await userEvent.click(signOutButton);
+    const signOutButton = canvas.getByRole('button', { name: /Sign out/i })
+    await userEvent.click(signOutButton)
 
     // Optionally, check for redirect or logged-out state (e.g., checking localStorage or redirect message)
-    const loggedOutMessage = canvas.queryByText(/You have been logged out/i);
+    const loggedOutMessage = canvas.queryByText(/You have been logged out/i)
     if (loggedOutMessage) {
-      await expect(loggedOutMessage).toBeInTheDocument();
+      await expect(loggedOutMessage).toBeInTheDocument()
     }
   },
-};
+}
